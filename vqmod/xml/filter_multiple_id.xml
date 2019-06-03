@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification>
-    <name>filterMultipleID</name>
+    <name>filter_multiple_id</name>
     <version>1.0.0</version>
     <author>Basheir Hassan</author>
-    <code>filterMultipleID</code>
+    <code>filter_multiple_id</code>
 
 
     <file path="admin/view/template/catalog/product_list.twig">
@@ -13,8 +13,8 @@
 	<!-- filterUPCSKU -->
 			</div>
 			<div class="form-group">
-                <label class="control-label" for="input-id">filter Multiple ID </label>
-                <input type="text" data-role="tagsinput" name="filter_MultipleID" value="{{ filter_MultipleID }}"  id="input-MultipleID" class="form-control" />
+                <label class="control-label" for="input-id">Filter Multiple ID </label>
+                <input type="text" data-role="tagsinput"  name="filter_multiple_id" value="{{ filter_multiple_id }}"  id="input-multiple_id" class="form-control" />
 			</div>
 			<div class="form-group">
 	<!-- filterUPCSKU end -->
@@ -25,23 +25,59 @@
         <operation error="abort">
             <search><![CDATA[{{ footer }}]]></search>
             <add position="before"><![CDATA[
-	<!-- filterMultipleID -->
+	<!-- filter_multiple_id -->
 		<script src="./view/javascript/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
 		<link rel="stylesheet" href="./view/javascript/bootstrap-tagsinput/bootstrap-tagsinput.css">
-	<!-- filterMultipleID end -->
+
+
+
+		    <script>
+        $('#input-multiple_id').tagsinput({
+        confirmKeys: [32, 13, 44]
+         });
+
+
+
+
+                     $('#input-multiple_id').on('beforeItemAdd', function(event) {
+                        var tag = event.item;
+                        // Do some processing here
+                    $.getJSON( "index.php?route=catalog/product/issetProduct&user_token={{ user_token }}",{product_id:tag }, function( json ) {
+
+
+                    if(json.result < 1 ){
+
+                    alert('Error');
+
+
+                    console.log(tag);
+
+                    }
+
+
+                     });
+
+
+            });
+
+             </script>
+
+
+
+	<!-- filter_multiple_id end -->
 			]]></add>
         </operation>
 
-
+  
         <operation error="abort">
             <search><![CDATA[var filter_model = $('input[name=\'filter_model\']').val();]]></search>
 
             <add position="before"><![CDATA[
 
-	var filter_MultipleID = $('input[name=\'filter_MultipleID\']').val();
+	var filter_multiple_id = $('input[name=\'filter_multiple_id\']').val();
 
-	if (filter_MultipleID) {
-		url += '&filter_MultipleID=' + encodeURIComponent(filter_MultipleID);
+	if (filter_multiple_id) {
+		url += '&filter_multiple_id=' + encodeURIComponent(filter_multiple_id);
 	}
 			]]></add>
         </operation>
@@ -58,12 +94,12 @@
 
             <add position="after" offset="1"><![CDATA[
 
-		if (isset($this->request->get['filter_MultipleID'])) {
-			$filter_MultipleID = $this->request->get['filter_MultipleID'];
+		if (isset($this->request->get['filter_multiple_id'])) {
+			$filter_MultipleID = $this->request->get['filter_multiple_id'];
 		} else {
 			$filter_MultipleID = '';
 		}
-	// filterMultipleID end
+	// filter_multiple_id end
 			]]></add>
         </operation>
 
@@ -72,15 +108,15 @@
             <search><![CDATA[$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));]]></search>
 
             <add position="after" offset="1"><![CDATA[
-	// filterMultipleID
+	// filter_multiple_id
 		if (isset($this->request->get['filter_image'])) {
 			$url .= '&filter_image=' . $this->request->get['filter_image'];
 		}
 
-		if (isset($this->request->get['filter_MultipleID'])) {
-			$url .= '&filter_MultipleID=' . $this->request->get['filter_MultipleID'];
+		if (isset($this->request->get['filter_multiple_id'])) {
+			$url .= '&filter_multiple_id=' . $this->request->get['filter_multiple_id'];
 		}
-	// filterMultipleID end
+	// filter_multiple_id end
 			]]></add>
         </operation>
 
@@ -90,9 +126,9 @@
 
 
             <add position="after"><![CDATA[
-	// filterMultipleID
-			'filter_MultipleID'	 	  => $filter_MultipleID,
-	// filter_MultipleID end
+	// filter_multiple_id
+			'filter_multiple_id'	 	  => $filter_MultipleID,
+	// filter_multiple_id end
 			]]></add>
         </operation>
 
@@ -101,9 +137,9 @@
             <search><![CDATA[$data['filter_model'] = $filter_model;]]></search>
 
             <add position="after"><![CDATA[
-	        // filter_MultipleID
-		        $data['filter_MultipleID'] = $filter_MultipleID;
-	        // filter_MultipleID end
+	        // filter_multiple_id
+		        $data['filter_multiple_id'] = $filter_MultipleID;
+	        // filter_multiple_id end
 			]]></add>
         </operation>
 
@@ -118,16 +154,69 @@
 
             <add position="before"><![CDATA[
 
-	    // filter_MultipleID
-		if (isset($data['filter_MultipleID']) && $data['filter_MultipleID'] !== '') {
+	    // filter_multiple_id
 
-		     $sql .= " AND p.product_id IN (".$data['filter_MultipleID'] .")" ;
+		if (isset($data['filter_multiple_id']) && $data['filter_multiple_id'] !== '') {
+
+
+        $items = array();
+        $expload_items = explode(",",$data['filter_multiple_id']);
+
+
+		foreach ($expload_items as &$value) {
+           $items[] = (int) $value;
+        }
+
+
+        $imp_items = implode(",", $items);
+
+		     $sql .= " AND p.product_id IN (".$imp_items.")" ;
 		}
+
+
 			]]></add>
         </operation>
 
 
     </file>
+
+
+
+
+
+
+    <file path="admin/controller/catalog/product.php">
+        <operation error="abort">
+            <search><![CDATA[public function add() {]]></search>
+
+
+            <add position="before"><![CDATA[
+
+	    // filter_multiple_id
+
+
+            public function issetProduct() {
+
+
+                $product_id = (int) $this->request->get['product_id'];
+                $this->load->model('catalog/product');
+                $products = $this->model_catalog_product->getProduct($product_id);
+
+
+                    $count = count($products);
+               		$this->response->addHeader('Content-Type: application/json');
+		            $this->response->setOutput(json_encode(array('result'=>$count)));
+
+            }
+
+			]]></add>
+        </operation>
+
+
+    </file>
+
+
+
 
 
 </modification>
