@@ -32,33 +32,47 @@
 
 
 		    <script>
-        $('#input-multiple_id').tagsinput({
-        confirmKeys: [32, 13, 44]
-         });
+
+                $('#input-multiple_id').tagsinput({
+    confirmKeys: [32, 13, 44]
+});
 
 
+$('#input-multiple_id').on('beforeItemAdd', function (event) {
+    var tag = event.item;
+    $.getJSON("index.php?route=catalog/product/filter_multiple_id_issetProduct&user_token={{ user_token }}", {product_id: tag}, function (json) {
 
 
-                     $('#input-multiple_id').on('beforeItemAdd', function(event) {
-                        var tag = event.item;
-                        // Do some processing here
-                    $.getJSON( "index.php?route=catalog/product/issetProduct&user_token={{ user_token }}",{product_id:tag }, function( json ) {
+        if (json.result < 1) {
 
+            var obj = $('.bootstrap-tagsinput > span');
+            $.each(obj, function (key, value) {
 
-                    if(json.result < 1 ){
-
-                    alert('Error');
-
-
-                    console.log(tag);
-
-                    }
-
-
-                     });
-
+                if (tag == $(this).text()) {
+                    $(this).addClass('label label-danger label-important');
+                }
 
             });
+
+        } else {
+            var obj = $('.bootstrap-tagsinput > span');
+            $.each(obj, function (key, value) {
+
+                if (tag == $(this).text()) {
+                    $(this).removeClass('label-info').addClass('label label-success');
+
+                }
+
+            });
+
+
+        }
+
+
+    });
+
+
+});
 
              </script>
 
@@ -195,17 +209,14 @@
 	    // filter_multiple_id
 
 
-            public function issetProduct() {
-
+            public function filter_multiple_id_issetProduct() {
 
                 $product_id = (int) $this->request->get['product_id'];
                 $this->load->model('catalog/product');
                 $products = $this->model_catalog_product->getProduct($product_id);
-
-
-                    $count = count($products);
-               		$this->response->addHeader('Content-Type: application/json');
-		            $this->response->setOutput(json_encode(array('result'=>$count)));
+                $count = count($products);
+               	$this->response->addHeader('Content-Type: application/json');
+		        $this->response->setOutput(json_encode(array('result'=>$count)));
 
             }
 
