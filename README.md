@@ -2,16 +2,10 @@
 
 
 
-
-
-
-
 install
 
-
-[img]https://image.opencart.com/original/5cf52311e9684.jpg[/img]
-[img]https://image.opencart.com/original/5cf522be5f8c6.jpg[/img]
-
+<img src="https://image.opencart.com/original/5cf52311e9684.jpg" alt="Add Stores" >
+<img src="https://image.opencart.com/original/5cf522be5f8c6.jpg" alt="Add Stores" >
 
 openCart Url
 
